@@ -79,7 +79,7 @@ Advanced options:
 python run_deeprag.py inference \
     --question "What is the runtime of The Lord of the Rings trilogy?" \
     --max-steps 5 \
-    --retrieval-limit 3
+    --retriever hybrid
 ```
 
 ### 4. Training on Custom Data
@@ -88,9 +88,9 @@ To train DeepRAG on your own data:
 
 ```bash
 python run_deeprag.py train \
-    --train-file path/to/your/training_data.jsonl \
-    --num-epochs 3 \
-    --learning-rate 1e-5
+    --data path/to/your/training_data.jsonl \
+    --model microsoft/DialoGPT-medium \
+    --retriever hybrid
 ```
 
 Expected training data format:
@@ -104,7 +104,7 @@ Expected training data format:
 To evaluate on a test set:
 
 ```bash
-python run_deeprag.py evaluate --test-file path/to/test_data.jsonl
+python run_deeprag.py evaluate --test-data path/to/test_data.jsonl
 ```
 
 ## Configuration

@@ -21,17 +21,31 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 def load_training_data(file_path: str) -> List[Tuple[str, str]]:
-    """Load training data from JSON file"""
+    """Load training data from JSON or JSONL file"""
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        
         training_data = []
-        for item in data:
-            if isinstance(item, dict) and 'question' in item and 'answer' in item:
-                training_data.append((item['question'], item['answer']))
-            elif isinstance(item, list) and len(item) == 2:
-                training_data.append((item[0], item[1]))
+        
+        with open(file_path, 'r', encoding='utf-8') as f:
+            # Try to load as JSONL first (one JSON object per line)
+            content = f.read().strip()
+            if content.startswith('['):
+                # JSON array format
+                data = json.loads(content)
+                for item in data:
+                    if isinstance(item, dict) and 'question' in item and 'answer' in item:
+                        training_data.append((item['question'], item['answer']))
+                    elif isinstance(item, list) and len(item) == 2:
+                        training_data.append((item[0], item[1]))
+            else:
+                # JSONL format (one JSON object per line)
+                for line in content.split('\n'):
+                    line = line.strip()
+                    if line:
+                        item = json.loads(line)
+                        if isinstance(item, dict) and 'question' in item and 'answer' in item:
+                            training_data.append((item['question'], item['answer']))
+                        elif isinstance(item, list) and len(item) == 2:
+                            training_data.append((item[0], item[1]))
         
         return training_data
     except Exception as e:
